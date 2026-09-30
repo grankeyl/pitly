@@ -1,0 +1,26 @@
+# Развертывание на Render (бесплатный тариф): один веб-сервис из Dockerfile.
+# База данных: Neon (бесплатный Postgres), строка подключения вставляется в DATABASE_URL.
+services:
+  - type: web
+    name: pitly
+    runtime: docker
+    plan: free
+    dockerfilePath: backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      # Порт и публичный адрес Render выдает сам (PORT, RENDER_EXTERNAL_URL)
+      - key: ENV
+        value: dev # платежный провайдер пока тестовый; вход для разработки снаружи закрыт
+      - key: PAYMENT_PROVIDER
+        value: fake
+      - key: STATIC_DIR
+        value: /srv/www
+      - key: STATS_TZ
+        value: Europe/Moscow
+      - key: BOT_WEBHOOK_SECRET
+        generateValue: true # вебхук нужен на бесплатном тарифе: Telegram будит уснувший сервис
+      - key: DATABASE_URL
+        sync: false # вставить строку подключения Neon (с ?sslmode=require)
+      - key: BOT_TOKEN
+        sync: false # токен от BotFather

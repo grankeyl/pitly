@@ -1,0 +1,508 @@
+@import 'tailwindcss';
+
+/*
+ * Дизайн-система Pitly — тёмная тема в стиле YouTube.
+ *   Композиция Revolut Business (сумма и герой по центру, круги действий, карточки-списки, плавающий таб-бар),
+ *   голос Wise (жирные заголовки секций, карусель карточек, лента оплат, чипы).
+ *   Цвета — тёмная тема YouTube: фон #0f0f0f, поверхности #212121 / #303030, нейтральная заливка белый 10%,
+ *   текст #f1f1f1, вторичный #aaaaaa. Акцент — салатовый #b6f03c: главное действие, выбор, ссылки, активная вкладка.
+ *   Круглые кнопки — Liquid Glass: плоская заливка, стеклянная кромка с бликами, размытие под формой. Градиентов в заливках нет.
+ *   Формы круглые, шрифт SF Pro (системный).
+ */
+:root {
+  --t-bg: #0f0f0f;
+  --t-surface: #212121;
+  --t-surface-2: #303030;
+  --t-glass: rgb(255 255 255 / 0.1);
+  --t-separator: rgb(255 255 255 / 0.1);
+  --t-border: rgb(255 255 255 / 0.2);
+  --t-bar: rgb(33 33 33 / 0.88);
+  /* Текст на #0f0f0f: 16.9:1 / 8.2:1 / 6.0:1; на #212121: 14.3:1 / 6.9:1 / 5.1:1 */
+  --t-text: #f1f1f1;
+  --t-text-2: rgb(241 241 241 / 0.85);
+  --t-muted: #aaaaaa;
+  --t-dim: #909090;
+  --t-ink: #0f0f0f;
+  /* Акцент — салатовый; тёмный текст на нём даёт контраст 14:1 */
+  --t-accent: #b6f03c;
+  --t-accent-text: #b6f03c;
+  --t-on-accent: #0f0f0f;
+  --t-primary: #b6f03c;
+  --t-primary-active: #9bd22a;
+  --t-on-primary: #0f0f0f;
+
+  --c-bg: var(--t-bg);
+  --c-surface: var(--t-surface);
+  --c-surface-2: var(--t-surface-2);
+  --c-glass: var(--t-glass);
+  --c-border: var(--t-border);
+  --c-separator: var(--t-separator);
+  --c-text: var(--t-text);
+  --c-text-2: var(--t-text-2);
+  --c-muted: var(--t-muted);
+  --c-dim: var(--t-dim);
+  --c-ink: var(--t-ink);
+  --c-accent: var(--t-accent);
+  --c-accent-2: var(--t-accent-text);
+  --c-on-accent: var(--t-on-accent);
+  --c-accent-soft: rgb(182 240 60 / 0.12);
+  --c-input: var(--t-surface);
+  --c-selected: var(--t-surface-2);
+  --c-green: #2ba640;
+  --c-green-soft: rgb(43 166 64 / 0.18);
+  --c-danger: #ff6b6b;
+  --c-danger-soft: rgb(255 78 69 / 0.18);
+  --c-warning: #fbc02d;
+  --c-warning-soft: rgb(251 192 45 / 0.16);
+  /* Совместимость со старыми именами классов */
+  --c-forest: var(--t-accent);
+  --c-forest-2: var(--t-accent);
+  --c-purple: var(--t-accent);
+  --c-blue: var(--t-accent);
+  --c-teal: rgb(43 166 64 / 0.18);
+  --c-lime: var(--c-accent);
+  --c-lime-2: var(--c-accent-2);
+  --c-lime-soft: var(--c-accent-soft);
+
+  --ds-border-secondary: var(--t-border);
+  --ds-border-200: var(--t-separator);
+  --ds-border-300: var(--t-border);
+  --ds-fill-primary: var(--t-glass);
+  --ds-info: var(--t-accent-text);
+  --ds-danger: rgb(255 78 69 / 0.18);
+  --ds-bg-transparent: rgb(33 33 33 / 0.6);
+  --ds-shadow-8: none;
+  --ds-shadow-4: none;
+  --ds-shadow-field: none;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-separator: var(--c-separator);
+  --color-text: var(--c-text);
+  --color-muted: var(--c-muted);
+  --color-dim: var(--c-dim);
+  --color-lime: var(--c-lime);
+  --color-lime-2: var(--c-lime-2);
+  --color-lime-soft: var(--c-lime-soft);
+  --color-green: var(--c-green);
+  --color-blue: var(--c-blue);
+  --color-purple: var(--c-purple);
+  --color-danger: var(--c-danger);
+  --color-danger-soft: var(--c-danger-soft);
+  --color-warning: var(--c-warning);
+  --color-glass: var(--c-glass);
+  --color-border: var(--c-border);
+  --color-forest: var(--c-forest);
+  --color-forest-2: var(--c-forest-2);
+  --color-green-soft: var(--c-green-soft);
+  --color-warning-soft: var(--c-warning-soft);
+  --color-text-2: var(--c-text-2);
+  --color-accent: var(--c-accent);
+  --color-accent-2: var(--c-accent-2);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-ink: var(--c-ink);
+  --color-on-accent: var(--c-on-accent);
+  --color-teal: var(--c-teal);
+  --color-input: var(--c-input);
+  --color-selected: var(--c-selected);
+
+  /* Радиусы Wise: small 10 / medium 16 / large 24 */
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 24px;
+  --radius-sheet: 24px;
+
+  /*
+   * SF Pro. Шрифт системный и распространять его файлы нельзя, поэтому он берётся с устройства:
+   * на iPhone, iPad и Mac это SF Pro, на Android — Roboto, на Windows — Segoe UI.
+   */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, 'Roboto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'Roboto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Tiempos Text', 'Anthropic Serif', Georgia, 'Times New Roman', serif;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+/* Заголовки и суммы: то же семейство, самое жирное начертание */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-feature-settings: 'tnum';
+}
+
+/*
+ * Углы — круглые: круги для аватаров и действий, пилюли для кнопок, чипов и таб-бара,
+ * радиус 16 у карточек и 12 у полей (как миниатюры и панели YouTube). Значения в переменных, классы r-* только ссылаются на них.
+ */
+:root {
+  --r-card: 24px;
+  --r-field: 20px;
+  --r-ctl: 9999px;
+  --r-avatar: 9999px;
+  --r-hero: 9999px;
+  --r-pill: 9999px;
+  --r-bar: 9999px;
+}
+.r-card {
+  border-radius: var(--r-card);
+}
+.r-field {
+  border-radius: var(--r-field);
+}
+.r-ctl {
+  border-radius: var(--r-ctl);
+}
+.r-avatar {
+  border-radius: var(--r-avatar);
+}
+.r-hero {
+  border-radius: var(--r-hero);
+}
+.r-tag {
+  border-radius: 9999px;
+}
+
+html {
+  height: 100%;
+  /* Скроллбар как в нативном приложении — не занимает место */
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+html,
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  /* Мобильное приложение: без выделения текста и долгого тапа, только нативный скролл */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: pan-y;
+}
+
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Экран начинается под шапкой Telegram; фон плоский, без градиента */
+/*
+ * Безопасные зоны. В полноэкранном режиме Telegram рисует свои кнопки поверх страницы:
+ * сверху складываем вырез устройства и высоту шапки Telegram, снизу берём большее из системного и телеграмного отступа.
+ */
+:root {
+  --safe-top: calc(var(--tg-viewport-safe-area-inset-top, env(safe-area-inset-top, 0px)) + var(--tg-viewport-content-safe-area-inset-top, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--tg-viewport-safe-area-inset-bottom, 0px));
+}
+.screen {
+  padding-top: var(--safe-top);
+  background: var(--c-bg);
+}
+/* Появление экрана: короткое проявление со сдвигом. Закреплённые снизу кнопки не трогаем: сдвиг предка сорвал бы их с места */
+.screen > :not(.fixed) {
+  animation: screen-in 260ms var(--ease-out) both;
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+html, body {
+  overscroll-behavior-y: none;
+}
+
+/* Поверхности браузера — из той же палитры */
+::selection {
+  background: color-mix(in srgb, var(--t-accent) 40%, transparent);
+  color: var(--c-text);
+}
+input,
+textarea {
+  caret-color: var(--c-accent-2);
+}
+:focus-visible {
+  outline: 2px solid var(--c-accent-2);
+  outline-offset: 2px;
+}
+/* У полей ввода фокус показывает их контейнер (кольцо карточки, цвет знака валюты), своя рамка была бы второй */
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+button {
+  touch-action: manipulation;
+}
+
+/* Всё кликабельное — с курсором-рукой (dev в браузере, Telegram Desktop) */
+button:not(:disabled),
+a,
+[role='button'],
+.tap:not(:disabled) {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+
+/* Иконка из SVG-файла, окрашиваемая через currentColor */
+.ic {
+  display: inline-block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask: var(--ic) center / contain no-repeat;
+  -webkit-mask: var(--ic) center / contain no-repeat;
+}
+
+/*
+ * Кнопки: primary — белая пилюля с тёмным текстом (как в тёмной теме Revolut), neutral — белый 12%.
+ * Имена .liquid-* оставлены ради совместимости с разметкой.
+ */
+/*
+ * Liquid Glass / Regular — по спецификации из Figma (кнопка 48×48, радиус 24):
+ *   заливка glass/fill #FFFFFF 12%, внутренняя обводка 1px glass/stroke #FFFFFF 22%.
+ * Заливка плоская, без градиента. Эффект стекла даёт только кромка: обводка приглушённая (в среднем 12%), чуть ярче там, где на неё падает свет
+ * (сверху-слева) и где он выходит (снизу-справа), плюс размытие того, что под кнопкой.
+ */
+.liquid {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-ctl);
+  background: var(--lq-fill);
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  transition: filter 180ms var(--ease-out);
+}
+/* Кромка: кольцо толщиной 1px внутри формы, яркость меняется по кругу */
+.liquid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 315deg,
+    rgb(255 255 255 / var(--lq-rim-hi)) 0deg,
+    rgb(255 255 255 / var(--lq-rim)) 70deg,
+    rgb(255 255 255 / var(--lq-rim-lo)) 125deg,
+    rgb(255 255 255 / var(--lq-rim-hi)) 180deg,
+    rgb(255 255 255 / var(--lq-rim)) 250deg,
+    rgb(255 255 255 / var(--lq-rim-lo)) 305deg,
+    rgb(255 255 255 / var(--lq-rim-hi)) 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+.liquid:active {
+  filter: brightness(0.88);
+}
+/* Нейтральное стекло — ровно значения из Figma */
+.liquid-dark {
+  --lq-fill: rgb(255 255 255 / 0.12);
+  --lq-rim: 0.12;
+  --lq-rim-hi: 0.3;
+  --lq-rim-lo: 0.04;
+  color: var(--c-text);
+}
+/* Главное действие — салатовое стекло */
+.liquid-lime {
+  --lq-fill: var(--t-primary);
+  --lq-rim: 0.2;
+  --lq-rim-hi: 0.5;
+  --lq-rim-lo: 0.06;
+  color: var(--t-on-primary);
+}
+/* Выбранный чип — светлое стекло */
+.chip-on {
+  --lq-fill: #f1f1f1;
+  --lq-rim: 0.3;
+  --lq-rim-hi: 0.7;
+  --lq-rim-lo: 0.1;
+  color: #0f0f0f;
+}
+.liquid-bar {
+  --lq-fill: var(--t-bar);
+  --lq-rim: 0.08;
+  --lq-rim-hi: 0.18;
+  --lq-rim-lo: 0.03;
+}
+
+/* Тёмная пилюля «Проверить» (MEMGIFT / Bonly) */
+/* Нейтральная пилюля: белый 12% */
+.pill-dark {
+  background: rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+  border-radius: var(--r-pill);
+}
+
+/*
+ * Стекло — только там, где элемент плавает над прокручиваемым контентом (таб-бар) или над градиентом канвы (верхний ряд).
+ */
+.glass-bar {
+  position: relative;
+  border-radius: var(--r-bar);
+  background: rgb(40 40 40 / 0.72);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+}
+.glass-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 315deg,
+    rgb(255 255 255 / 0.26) 0deg,
+    rgb(255 255 255 / 0.1) 50deg,
+    rgb(255 255 255 / 0.04) 125deg,
+    rgb(255 255 255 / 0.2) 180deg,
+    rgb(255 255 255 / 0.1) 230deg,
+    rgb(255 255 255 / 0.04) 305deg,
+    rgb(255 255 255 / 0.26) 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+/* Обои чата для предпросмотра поста: паттерн обоев Telegram поверх ровного тёмного фона, без градиентов */
+.tg-wallpaper {
+  position: relative;
+  isolation: isolate;
+  background-color: #17171a;
+}
+.tg-wallpaper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('./assets/telegram/pattern.svg') top center / 380px auto repeat;
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.tap {
+  transition: transform 160ms var(--ease-out), opacity 160ms var(--ease-out);
+}
+.tap:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+/* Скелетон: по заготовке слева направо проходит мягкий блик */
+@keyframes skeleton-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--c-surface);
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.07) 50%, transparent 80%);
+  animation: skeleton-sweep 1.5s var(--ease-out) infinite;
+}
+
+/* Всплывающее окно: фон проявляется, панель выезжает снизу */
+@keyframes sheet-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sheet-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.sheet-backdrop { animation: sheet-fade 200ms var(--ease-out) both; }
+.sheet-panel { animation: sheet-up 260ms var(--ease-out) both; }
+
+/*
+ * График раскрывается слева направо шторкой. Штриховой способ здесь не годится:
+ * линия растянута под ширину экрана, и штрих рвёт её посередине.
+ */
+@keyframes reveal {
+  from { clip-path: inset(-12px 100% -12px -12px); }
+  to { clip-path: inset(-12px -12px -12px -12px); }
+}
+.draw {
+  animation: reveal 900ms var(--ease-out) both;
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+.pop-in { animation: pop-in 320ms var(--ease-out) both; }
+
+/* Круг ожидания: три точки по очереди */
+@keyframes dot {
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+.dots > i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: dot 1.2s ease-in-out infinite;
+}
+.dots > i:nth-child(2) { animation-delay: 0.15s; }
+.dots > i:nth-child(3) { animation-delay: 0.3s; }
+
+/* Палец уехал с кнопки — нажатие отменено, кнопка отпускается сразу */
+.tap-cancelled .tap:active {
+  transform: none;
+  opacity: 1;
+}
+
+input,
+textarea {
+  font: inherit;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--c-dim);
+}

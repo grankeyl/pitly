@@ -1,0 +1,742 @@
+openapi: 3.0.3
+info:
+  title: Pitly API
+  version: 0.1.0
+  description: |
+    API Telegram Mini App для платных подписок на каналы.
+    Все суммы — в минимальных единицах валюты (копейках), целые числа.
+    Авторизация: заголовок `Authorization: tma <initData>`.
+servers:
+  - url: /api
+security:
+  - tma: []
+
+paths:
+  /me:
+    get:
+      operationId: getMe
+      summary: Текущий пользователь, баланс и настройки платформы
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Me" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /channels:
+    get:
+      operationId: listChannels
+      summary: Каналы, где текущий пользователь — владелец
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Channel" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /channels/connect:
+    get:
+      operationId: getConnectLink
+      summary: Ссылка, по которой автор добавляет бота админом в свой канал
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectLink" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /channels/{channelId}:
+    parameters:
+      - $ref: "#/components/parameters/ChannelId"
+    get:
+      operationId: getChannel
+      summary: Канал с подписками (только для владельца)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ChannelDetail" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteChannel
+      summary: Удалить канал из Pitly. Продажи останавливаются, бот выходит из канала
+      responses:
+        "204":
+          description: Удалён
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateChannel
+      summary: Обновить описание канала на странице оплаты
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChannelUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Channel" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /channels/{channelId}/products:
+    parameters:
+      - $ref: "#/components/parameters/ChannelId"
+    post:
+      operationId: createProduct
+      summary: Создать подписку в канале вместе с периодами
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /products/{productId}:
+    parameters:
+      - $ref: "#/components/parameters/ProductId"
+    get:
+      operationId: getProduct
+      summary: Подписка с периодами (только для владельца)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteProduct
+      summary: Удалить подписку. Кто уже оплатил, сохраняет доступ до конца срока
+      responses:
+        "204":
+          description: Удалена
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: updateProduct
+      summary: Изменить название, описание, оформление и способы оплаты
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /products/{productId}/plans:
+    parameters:
+      - $ref: "#/components/parameters/ProductId"
+    post:
+      operationId: createPlan
+      summary: Добавить период подписки
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlanInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Plan" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /products/{productId}/share:
+    parameters:
+      - $ref: "#/components/parameters/ProductId"
+    post:
+      operationId: shareProduct
+      summary: Подготовить пост подписки, который автор отправит в чат или канал
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PreparedShare" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /products/{productId}/offer:
+    parameters:
+      - $ref: "#/components/parameters/ProductId"
+    get:
+      operationId: getProductOffer
+      summary: Страница оплаты конкретной подписки для подписчика
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Offer" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /plans/{planId}:
+    parameters:
+      - name: planId
+        in: path
+        required: true
+        schema: { type: integer, format: int64 }
+    put:
+      operationId: updatePlan
+      summary: Изменить период
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlanUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Plan" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /offers/{channelId}:
+    parameters:
+      - $ref: "#/components/parameters/ChannelId"
+    get:
+      operationId: getOffer
+      summary: Страница оплаты канала для подписчика — первая подписка, которая в продаже
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Offer" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /checkout:
+    post:
+      operationId: createCheckout
+      summary: Создать платёж и получить ссылку на оплату
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CheckoutRequest" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Checkout" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /payments/{paymentId}:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getPayment
+      summary: Статус платежа (подписчик опрашивает после возврата со страницы оплаты)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaymentStatus" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /subscriptions:
+    get:
+      operationId: listMySubscriptions
+      summary: Подписки текущего пользователя как подписчика
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MySubscription" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /stats:
+    get:
+      operationId: getStats
+      summary: Статистика автора
+      parameters:
+        - name: days
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 365, default: 30 }
+        - name: channelId
+          in: query
+          required: false
+          description: Только один канал автора
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Stats" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /stats/payments:
+    get:
+      operationId: listDayPayments
+      summary: Успешные оплаты автора — за один день или последние
+      parameters:
+        - name: date
+          in: query
+          required: false
+          description: День. Без него отдаются последние оплаты
+          schema: { type: string, format: date }
+        - name: channelId
+          in: query
+          required: false
+          description: Только один канал автора
+          schema: { type: integer, format: int64 }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 200, default: 200 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/DayPayment" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /payouts:
+    get:
+      operationId: listPayouts
+      summary: История выводов
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Payout" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: requestPayout
+      summary: Запросить вывод доступного баланса
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PayoutRequest" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Payout" }
+        default: { $ref: "#/components/responses/Error" }
+
+components:
+  securitySchemes:
+    tma:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  parameters:
+    ProductId:
+      name: productId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+    ChannelId:
+      name: channelId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+
+  responses:
+    Error:
+      description: Ошибка
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          description: Машиночитаемый код (not_found, forbidden, validation, ...)
+        message: { type: string }
+
+    User:
+      type: object
+      required: [id, firstName, lastName]
+      properties:
+        id: { type: integer, format: int64 }
+        username: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        photoUrl: { type: string }
+
+    Balance:
+      type: object
+      required: [currency, pending, available, paidOut]
+      properties:
+        currency: { type: string, example: RUB }
+        pending:
+          type: integer
+          format: int64
+          description: В холде, станет доступно после окончания холда
+        available:
+          type: integer
+          format: int64
+          description: Можно вывести
+        paidOut:
+          type: integer
+          format: int64
+          description: Всего выведено
+
+    Me:
+      type: object
+      required: [user, balance, commissionBps, minPayout, holdHours, payoutMethods]
+      properties:
+        user: { $ref: "#/components/schemas/User" }
+        balance: { $ref: "#/components/schemas/Balance" }
+        commissionBps:
+          type: integer
+          description: Комиссия платформы для этого автора, 2000 = 20%
+        minPayout: { type: integer, format: int64 }
+        holdHours: { type: integer }
+        payoutMethods:
+          type: array
+          items: { $ref: "#/components/schemas/PayoutMethod" }
+
+    Channel:
+      type: object
+      required: [id, title, chatType, description, botIsAdmin, botIssue, activeSubscribers, offerUrl, connectedAt]
+      properties:
+        botIssue:
+          type: string
+          enum: [none, removed, no_rights]
+          description: Что не так с ботом в канале. removed — бота убрали, no_rights — не хватает прав
+        connectedAt:
+          type: string
+          format: date-time
+          description: Когда бота последний раз добавили админом в этот канал
+        id: { type: integer, format: int64 }
+        title: { type: string }
+        username: { type: string }
+        chatType:
+          type: string
+          enum: [channel, supergroup, group]
+        description: { type: string }
+        botIsAdmin:
+          type: boolean
+          description: false — бота удалили из админов, продажи остановлены
+        activeSubscribers: { type: integer, format: int64 }
+        offerUrl:
+          type: string
+          description: Ссылка на страницу оплаты, которой автор делится с аудиторией
+
+    ChannelDetail:
+      type: object
+      required: [channel, products]
+      properties:
+        channel: { $ref: "#/components/schemas/Channel" }
+        products:
+          type: array
+          items: { $ref: "#/components/schemas/Product" }
+
+    ChannelUpdate:
+      type: object
+      required: [description]
+      properties:
+        description: { type: string, maxLength: 1000 }
+
+    ConnectLink:
+      type: object
+      required: [url, botUsername]
+      properties:
+        url: { type: string }
+        botUsername: { type: string }
+
+    Product:
+      type: object
+      required: [id, channelId, channelTitle, title, description, buttonText, paymentMethods, isActive, activeSubscribers, url, plans]
+      properties:
+        id: { type: integer, format: int64 }
+        channelId: { type: integer, format: int64 }
+        channelTitle: { type: string }
+        title: { type: string }
+        description: { type: string }
+        buttonText:
+          type: string
+          description: Надпись на кнопке под постом
+        imageId: { type: string, format: uuid }
+        imageUrl: { type: string }
+        paymentMethods:
+          type: array
+          description: Пустой список — доступны все способы
+          items: { $ref: "#/components/schemas/PaymentMethod" }
+        isActive: { type: boolean }
+        activeSubscribers: { type: integer, format: int64 }
+        url:
+          type: string
+          description: Ссылка на страницу оплаты этой подписки
+        plans:
+          type: array
+          items: { $ref: "#/components/schemas/Plan" }
+
+    PreparedShare:
+      type: object
+      required: [preparedMessageId]
+      properties:
+        preparedMessageId:
+          type: string
+          description: Идентификатор для WebApp.shareMessage
+
+    ProductInput:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 64 }
+        description: { type: string, maxLength: 500 }
+        buttonText: { type: string, maxLength: 32 }
+        imageId:
+          type: string
+          format: uuid
+          description: Не передан — картинки нет
+        paymentMethods:
+          type: array
+          items: { $ref: "#/components/schemas/PaymentMethod" }
+
+    ProductCreate:
+      allOf:
+        - $ref: "#/components/schemas/ProductInput"
+        - type: object
+          required: [plans]
+          properties:
+            plans:
+              type: array
+              minItems: 1
+              maxItems: 6
+              description: Периоды, с которыми создаётся подписка. Сроки не повторяются
+              items: { $ref: "#/components/schemas/PlanInput" }
+
+    ProductUpdate:
+      allOf:
+        - $ref: "#/components/schemas/ProductInput"
+        - type: object
+          required: [isActive]
+          properties:
+            isActive: { type: boolean }
+
+    Plan:
+      type: object
+      required: [id, channelId, productId, title, price, currency, periodDays, isActive]
+      properties:
+        id: { type: integer, format: int64 }
+        channelId: { type: integer, format: int64 }
+        productId: { type: integer, format: int64 }
+        title:
+          type: string
+          description: Название периода, собирается из срока
+        price: { type: integer, format: int64 }
+        currency: { type: string }
+        periodDays:
+          type: integer
+          description: 0 — бессрочный доступ
+        isActive: { type: boolean }
+
+    PlanInput:
+      type: object
+      required: [price, periodDays]
+      properties:
+        price: { type: integer, format: int64 }
+        periodDays: { type: integer, minimum: 0, maximum: 3650 }
+
+    PlanUpdate:
+      allOf:
+        - $ref: "#/components/schemas/PlanInput"
+        - type: object
+          required: [isActive]
+          properties:
+            isActive: { type: boolean }
+
+    Offer:
+      type: object
+      required: [channelId, title, description, plans, paymentMethods, available, buttonText, own]
+      properties:
+        own:
+          type: boolean
+          description: true — страницу открыл владелец канала, купить у себя нельзя
+        channelId: { type: integer, format: int64 }
+        productId:
+          type: integer
+          format: int64
+          description: Отсутствует, если у канала нет подписок в продаже
+        productTitle: { type: string }
+        buttonText: { type: string }
+        imageUrl: { type: string }
+        title:
+          type: string
+          description: Название канала
+        username: { type: string }
+        description: { type: string }
+        available:
+          type: boolean
+          description: false — канал временно не принимает оплату
+        plans:
+          type: array
+          items: { $ref: "#/components/schemas/Plan" }
+        paymentMethods:
+          type: array
+          items: { $ref: "#/components/schemas/PaymentMethod" }
+        subscription: { $ref: "#/components/schemas/MySubscription" }
+
+    PaymentMethod:
+      type: string
+      enum: [card, sbp]
+
+    PayoutMethod:
+      type: string
+      enum: [card, sbp, usdt_ton]
+
+    CheckoutRequest:
+      type: object
+      required: [planId, method]
+      properties:
+        planId: { type: integer, format: int64 }
+        method: { $ref: "#/components/schemas/PaymentMethod" }
+
+    Checkout:
+      type: object
+      required: [paymentId, paymentUrl]
+      properties:
+        paymentId: { type: string, format: uuid }
+        paymentUrl: { type: string }
+
+    PaymentStatus:
+      type: object
+      required: [id, status, amount, currency, channelId, channelTitle]
+      properties:
+        id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [pending, succeeded, failed, refunded]
+        amount: { type: integer, format: int64 }
+        currency: { type: string }
+        channelId: { type: integer, format: int64 }
+        channelTitle: { type: string }
+        inviteLink:
+          type: string
+          description: Появляется после успешной оплаты
+
+    MySubscription:
+      type: object
+      required: [id, channelId, channelTitle, planTitle, status, startedAt]
+      properties:
+        id: { type: integer, format: int64 }
+        channelId: { type: integer, format: int64 }
+        channelTitle: { type: string }
+        channelUsername: { type: string }
+        planTitle: { type: string }
+        status:
+          type: string
+          enum: [active, expired, canceled]
+        startedAt: { type: string, format: date-time }
+        expiresAt:
+          type: string
+          format: date-time
+          description: Отсутствует у бессрочного доступа
+        inviteLink: { type: string }
+
+    Stats:
+      type: object
+      required: [days, currency, netRevenue, grossRevenue, paymentsCount, payingUsers, activeSubscribers, newSubscribers, churnedSubscribers, daily]
+      properties:
+        days: { type: integer }
+        currency: { type: string }
+        netRevenue:
+          type: integer
+          format: int64
+          description: Доход автора после комиссии
+        grossRevenue:
+          type: integer
+          format: int64
+          description: Сколько заплатили подписчики
+        paymentsCount: { type: integer, format: int64 }
+        payingUsers: { type: integer, format: int64 }
+        activeSubscribers: { type: integer, format: int64 }
+        newSubscribers: { type: integer, format: int64 }
+        churnedSubscribers: { type: integer, format: int64 }
+        daily:
+          type: array
+          items: { $ref: "#/components/schemas/DailyPoint" }
+
+    DailyPoint:
+      type: object
+      required: [date, net, payments]
+      properties:
+        date: { type: string, format: date }
+        net: { type: integer, format: int64 }
+        payments: { type: integer, format: int64 }
+
+    DayPayment:
+      type: object
+      required: [id, paidAt, amount, net, method, channelTitle, planTitle, payerName]
+      properties:
+        id: { type: string, format: uuid }
+        paidAt: { type: string, format: date-time }
+        amount: { type: integer, format: int64 }
+        net: { type: integer, format: int64 }
+        method: { $ref: "#/components/schemas/PaymentMethod" }
+        channelTitle: { type: string }
+        planTitle: { type: string }
+        payerName: { type: string }
+
+    Payout:
+      type: object
+      required: [id, amount, currency, method, destination, status, createdAt]
+      properties:
+        id: { type: integer, format: int64 }
+        amount: { type: integer, format: int64 }
+        currency: { type: string }
+        method: { $ref: "#/components/schemas/PayoutMethod" }
+        destination:
+          type: string
+          description: Замаскированные реквизиты
+        status:
+          type: string
+          enum: [requested, processing, paid, rejected]
+        comment: { type: string }
+        createdAt: { type: string, format: date-time }
+        processedAt: { type: string, format: date-time }
+
+    PayoutRequest:
+      type: object
+      required: [amount, method, destination]
+      properties:
+        amount: { type: integer, format: int64 }
+        method: { $ref: "#/components/schemas/PayoutMethod" }
+        destination: { type: string, minLength: 4, maxLength: 128 }

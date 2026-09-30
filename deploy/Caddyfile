@@ -1,0 +1,5 @@
+# Caddy сам выпускает и продлевает HTTPS-сертификат для домена.
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:8080
+}
